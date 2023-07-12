@@ -53,7 +53,15 @@ def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0, radius=1):
         try:
             targets = heasarc.query_region(pos, mission=tables[a], radius='5 degree')
             
-            name      = str(targets[a]['NAME'])
+            if 'NAME' in targets[i].keys():
+                name      = str(targets[i]['NAME'])
+            elif 'name' in targets[i].keys():
+                name      = str(targets[i]['name'])
+            elif 'id' in targets[i].keys():
+                name      = str(targets[i]['id'])
+            else:
+                name      = "n/a"
+            
             ra        = float(targets[a]['RA']) * u.deg
             dec       = float(targets[a]['DEC']) * u.deg
             
@@ -90,7 +98,15 @@ def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0, radius=1):
 
         # if table is available, then retrieve information of all targets and append to gal_list
         for i in range(0, len(targets)):
-            name      = str(targets[i]['NAME'])
+            if 'NAME' in targets[i].keys():
+                name      = str(targets[i]['NAME'])
+            elif 'name' in targets[i].keys():
+                name      = str(targets[i]['name'])
+            elif 'id' in targets[i].keys():
+                name      = str(targets[i]['id'])
+            else:
+                name      = "n/a"
+                
             ra        = float(targets[i]['RA']) * u.deg
             dec       = float(targets[i]['DEC']) * u.deg
             
