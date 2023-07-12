@@ -5,8 +5,6 @@ def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0, radius=1):
 
     Targets with no distance information will be given a distance value of -1.
 
-    Parameters
-    ----------
     Args:
         ra (tuple): right ascension, min and max region
         dec (tuple): declination, min and max region
@@ -15,7 +13,6 @@ def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0, radius=1):
 
     Returns:
         astropy.QTable: returns astropy.QTable of galaxies and their 3D coordinates in the specified region
-
     """
 
     from astropy.table import QTable
