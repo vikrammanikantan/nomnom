@@ -74,4 +74,5 @@ def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0):
     ###
     # return table
     ###
+    
     return gal_list
