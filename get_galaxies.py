@@ -46,44 +46,47 @@ def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0):
 
     #####
     # loop through tables, and initialize the galaxy table (gal_list) with the first valid galaxy
-    ra=None
-    a=0
+    ra = None
+    a = 0
+
     while ra==None:
         try:
-            # get list of targets from specified table within given radius of our GW event
             targets = heasarc.query_region(pos, mission=tables[a], radius='5 degree')
-    
-            # save the position and name of this target
+            
+            name      = str(targets[a]['NAME'])
             ra        = float(targets[a]['RA']) * u.deg
             dec       = float(targets[a]['DEC']) * u.deg
-            if "REDSHIFT" in targets[i].keys():
-                distance  = float(targets[i]['REDSHIFT']) * cu.redshift
-            elif "redshift" in targets[i].keys():
-                distance  = float(targets[i]['redshift']) * cu.redshift
-            elif "Distance" in targets[i].keys():
-                distance  = float(targets[i]['Distance']) * cu.redshift
-            elif "z" in targets[i].keys():
-                distance  = float(targets[i]['z']) * cu.redshift
+            
+            if "REDSHIFT" in targets[a].keys():
+                distance  = float(targets[a]['REDSHIFT']) * cu.redshift
+            elif "Distance" in targets[a].keys():
+                distance  = float(targets[a]['Distance']) * cu.redshift
+            elif "z" in targets[ascii].keys():
+                distance  = float(targets[a]['z']) * cu.redshift
             else:
                 distance = -1 * cu.redshift
-            name      = str(targets[a]['NAME'])
-            
-            # initialize the table with columns and one row of data
+
             gal_list = QTable([[name],[ra],[dec],[distance]], names=('Name', 'RA', 'DEC', 'Distance'), meta={'name': 'Galaxies in Region'})
+        
         except: 
+            print("An exception occured; moving on to next table")
+            print("(This is expected behavior)")
             ra=None
         a+=1
     #####
 
     #####
     # for every table in the catalog, loop through and find targets near to the GW event
-    for j in range(a, len(tables)):
+    for j in range(0, len(tables)):
 
-        # try to retrieve the table, if not possible, fast forward the loop to next iteration of j
+        # try to retrieve the table, if not possible, continue the loop to next iteration of j
         try:
             targets = heasarc.query_region(pos, mission=tables[j], radius='5 degree')
         except:
-            break
+            print("Table %d is empty"%j)
+            continue
+        
+        print("Table %d has data"%j)
 
         # if table is available, then retrieve information of all targets and append to gal_list
         for i in range(0, len(targets)):
