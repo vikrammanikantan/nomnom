@@ -56,7 +56,16 @@ def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0):
             # save the position and name of this target
             ra        = float(targets[a]['RA']) * u.deg
             dec       = float(targets[a]['DEC']) * u.deg
-            #distance  = float(targets[a]['REDSHIFT']) * cu.redshift
+            if "REDSHIFT" in targets[i].keys():
+                distance  = float(targets[i]['REDSHIFT']) * cu.redshift
+            elif "redshift" in targets[i].keys():
+                distance  = float(targets[i]['redshift']) * cu.redshift
+            elif "Distance" in targets[i].keys():
+                distance  = float(targets[i]['Distance']) * cu.redshift
+            elif "z" in targets[i].keys():
+                distance  = float(targets[i]['z']) * cu.redshift
+            else:
+                distance = -1 * cu.redshift
             name      = str(targets[a]['NAME'])
             
             # initialize the table with columns and one row of data
@@ -84,6 +93,8 @@ def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0):
             
             if "REDSHIFT" in targets[i].keys():
                 distance  = float(targets[i]['REDSHIFT']) * cu.redshift
+            elif "redshift" in targets[i].keys():
+                distance  = float(targets[i]['redshift']) * cu.redshift
             elif "Distance" in targets[i].keys():
                 distance  = float(targets[i]['Distance']) * cu.redshift
             elif "z" in targets[i].keys():
