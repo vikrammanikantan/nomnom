@@ -1,7 +1,7 @@
 def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0):
     """
     Takes the localization (with error) of a GW event, and returns the galaxies within that region. 
-    Drawn from ?? catalogue.
+    Drawn from heasarc catalogue with multiple databases.
 
     Parameters
     ----------
@@ -17,6 +17,11 @@ def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0):
     table:
         returns table of galaxies and their 3D coordinates in the specified region
     """
+
+    # 1. get coordinates into SkyCoord
+    # 2. get list of database tables
+    # 3. loop through each database and find neighbors within distance
+    # 4. return astropy table with 
 
     from astropy.table import QTable
     import astropy.units as u
@@ -46,38 +51,38 @@ def get_galaxies(ra='00h08m05.63s', dec='+14d50m23.3s', distance=0):
     dec = '+14d50m23.3s'
     pos = SkyCoord(ra+' '+dec, frame='icrs')
 
-    ###
-    # get list of galaxies
-    ###
-
-    targets = heasarc.query_region(pos, mission=tables[0], radius='5 degree')
-
-    ###
-    # initialize first row of table
-    ###
-
+    a=0
+    while ra==None:
+        try:
+            targets = heasarc.query_region(pos, mission=tables[a], radius='5 degree')
+            
+            ra        = float(targets[a]['RA']) * u.deg
+            dec       = float(targets[a]['DEC']) * u.deg
+            #distance  = float(targets[a]['REDSHIFT']) * cu.redshift
+            name      = str(targets[a]['NAME'])
+            
+            gal_list = QTable([[name],[ra],[dec],[distance]], names=('Name', 'RA', 'DEC', 'Distance'), meta={'name': 'Galaxies in Region'})
+        except: None
+        a+=1
     ra        = float(targets[0]['RA']) * u.deg
     dec       = float(targets[0]['DEC']) * u.deg
-    distance  = float(targets[0]['REDSHIFT']) * cu.redshift
+    #distance  = float(targets[0]['REDSHIFT']) * cu.redshift
     name      = str(targets[0]['NAME'])
 
     gal_list = QTable([[name],[ra],[dec],[distance]], names=('Name', 'RA', 'DEC', 'Distance'), meta={'name': 'Galaxies in Region'})
 
-    ###
-    # loop through targets, add to table
-    ###
 
-    for i in range(1, len(targets)):
-        ra        = float(targets[i]['RA']) * u.deg
-        dec       = float(targets[i]['DEC']) * u.deg
-        distance  = float(targets[i]['REDSHIFT']) * cu.redshift
-        name      = str(targets[i]['NAME'])
-        
-        current_gal = QTable([[name],[ra],[dec],[distance]], names=('Name', 'RA', 'DEC', 'Distance'))
-        gal_list    = vstack([gal_list, current_gal], join_type='inner')
-        
-        
-    ###
-    # return table
-    ###
+    for j in range(a, len(tables)):
+        try:
+            targets = heasarc.query_region(pos, mission=tables[j], radius='5 degree')
+        except:
+            break
+        for i in range(0, len(targets)):
+            ra        = float(targets[i]['RA']) * u.deg
+            dec       = float(targets[i]['DEC']) * u.deg
+            #distance  = float(targets[i]['REDSHIFT']) * cu.redshift
+            name      = str(targets[i]['NAME'])
+
+            current_gal = QTable([[name],[ra],[dec],[distance]], names=('Name', 'RA', 'DEC', 'Distance'))
+            gal_list    = vstack([gal_list, current_gal], join_type='inner')
     return gal_list
