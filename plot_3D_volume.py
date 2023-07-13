@@ -11,7 +11,7 @@ import pdb
 
 def plotfigure(results=gal_list):
     """
-make the 3d plot for the galaxy and gravitational wave event 
+    make the 3d plot for the galaxy and gravitational wave event 
     Parameters
     ----------
     r : int/float
