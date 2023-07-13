@@ -55,3 +55,4 @@ make the 3d plot for the galaxy and gravitational wave event
     return
 
 plotfigure()
+
