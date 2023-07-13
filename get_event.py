@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import sys
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+from scipy.stats import bayes_mvs  
 
 
 #gw_event_file = str(sys.argv[1])
@@ -14,10 +15,21 @@ gw_event_file = '/Users/smithwj/OneDrive - Vanderbilt/Code_Astro_Data/IGWN-GWTC3
 
 
 def load_gw_location_data(gw_data_file):
+
     '''
     Takes filepath of the .h5 LIGO input file, opens it, gets the RA, Dec, and redshift posteriors and returns them.
     Note - C01:IMRPhenomXPHM is the chosen waveform model for this exercise. The LIGO data files have multiple waveforms 
     for multiple waveform model choices, but we just choose this one for this exercise
+
+    Args:
+        gw_data_file (string) : filepath to the .h5 file
+
+
+    Returns:
+        ra_posterior (array) 
+        dec_posterior (array)
+        redshift_posterior (array)
+
     '''
 
     gw_event_data = h5py.File(gw_data_file, 'r')
@@ -36,14 +48,55 @@ def load_gw_location_data(gw_data_file):
     return gw_event_ra_posterior, gw_event_dec_posterior, gw_event_redshift_posterior
 
 
+
+# BS - check the gw load function and return RA, Dec, redshift
 ra_posterior, dec_posterior, redshift_posterior = load_gw_location_data(gw_event_file)
+
+
+
+def get_confidence_interval(posterior_data, confidence_level=0.9):
+
+    '''
+    Takes a LIGO posterior and returns a median value with a minimum and maximum 
+    for a given confidence interval.
+
+    Args:
+        posterior_data (array)
+        confidence_interval (float)
+
+
+    Returns:
+        mean (float)
+        confidence_min (float)
+        confidence_max (float)
+    '''
+
+    mean_cntr, _, _ = bayes_mvs(posterior_data, confidence_level)
+
+    mean = mean_cntr[0]
+    confidence_min = mean_cntr[1][0]
+    confidence_max = mean_cntr[1][1]
+
+    return mean, confidence_min, confidence_max
+
+
+
+# BS - check the get confidence interval function
+
+ra_mean, ra_min, ra_max = get_confidence_interval(ra_posterior)
+
+
+
+
+
+
 
 
 # BS - histograms of each of the posterior distributions
 
 def show_posterior_histograms(ra_data, dec_data, redshift_data):
 
-    # BS - still needs work
+    # BS - still needs workss
 
     plt.hist(ra_posterior, bins=100)
     plt.show()
